@@ -3,21 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GATE & GSI Exam Preparation - Unlimited Practice Questions</title>
+    <title>GATE & GSI Exam Preparation - Bulletproof Edition</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Main Application - No Login Required -->
-    <div id="app-screen" class="screen">
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+        <div class="login-container">
+            <div class="login-card card">
+                <div class="card__body">
+                    <div class="login-header">
+                        <h1>🎓 GATE & GSI Prep Master</h1>
+                        <p>Instant Practice • Zero Delays • Maximum Results</p>
+                    </div>
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email" required value="demo@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" id="password" class="form-control" placeholder="Enter your password" required value="demo123">
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">
+                            Sign In & Start Practice
+                        </button>
+                    </form>
+                    <div class="demo-credentials">
+                        <div class="demo-header">
+                            <h4>🚀 Demo Access Ready</h4>
+                        </div>
+                        <div class="demo-info">
+                            <p>📧 <strong>Email:</strong> demo@example.com</p>
+                            <p>🔑 <strong>Password:</strong> demo123</p>
+                        </div>
+                        <p class="demo-note">Click "Sign In" to start practicing immediately!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app-screen" class="screen hidden">
         <!-- Navigation Header -->
         <header class="app-header">
             <div class="container">
                 <div class="header-content">
                     <div class="logo">
-                        <h2>🎓 GATE & GSI Prep Master</h2>
+                        <h2>🎓 GATE & GSI Prep</h2>
                     </div>
-                    <div class="app-version">
-                        <span class="version-badge">v2.0 - Direct Access</span>
+                    <div class="user-menu">
+                        <span id="user-name">👨‍🎓 Welcome!</span>
+                        <button id="logout-btn" class="btn btn--outline btn--sm">Logout</button>
                     </div>
                 </div>
             </div>
@@ -33,31 +71,31 @@
         <!-- Dashboard Screen -->
         <div id="dashboard" class="content-screen">
             <div class="container">
-                <div class="dashboard-header">
-                    <h1>Welcome to GATE & GSI Prep Master</h1>
-                    <p>No login required - Start practicing unlimited questions immediately</p>
+                <div class="welcome-section">
+                    <h1 class="welcome-title">Choose Your Exam Path</h1>
+                    <p class="welcome-subtitle">Select your target examination for instant practice</p>
                 </div>
                 
                 <div class="progress-overview">
                     <div class="progress-card card">
                         <div class="card__body">
-                            <h3>Your Progress</h3>
+                            <h3>📊 Your Learning Progress</h3>
                             <div class="progress-stats">
                                 <div class="stat">
                                     <span class="stat-number" id="total-questions">0</span>
-                                    <span class="stat-label">Questions Attempted</span>
+                                    <span class="stat-label">Questions Solved</span>
                                 </div>
                                 <div class="stat">
                                     <span class="stat-number" id="accuracy-rate">0%</span>
-                                    <span class="stat-label">Accuracy</span>
+                                    <span class="stat-label">Accuracy Rate</span>
                                 </div>
                                 <div class="stat">
                                     <span class="stat-number" id="topics-completed">0</span>
-                                    <span class="stat-label">Topics Completed</span>
+                                    <span class="stat-label">Topics Mastered</span>
                                 </div>
                                 <div class="stat">
-                                    <span class="stat-number" id="study-streak">0</span>
-                                    <span class="stat-label">Day Streak</span>
+                                    <span class="stat-number" id="study-streak">1</span>
+                                    <span class="stat-label">Study Streak</span>
                                 </div>
                             </div>
                         </div>
@@ -70,14 +108,14 @@
                             <div class="card__body">
                                 <div class="exam-icon">🌍</div>
                                 <h3>GSI Combined Geo-Scientist</h3>
-                                <p>Complete preparation for GSI recruitment exam with comprehensive question banks covering General Studies, Geology, Geophysics, and Chemistry.</p>
-                                <div class="exam-topics">
-                                    <span class="topic-tag">General Studies</span>
-                                    <span class="topic-tag">Geology & Hydrogeology</span>
-                                    <span class="topic-tag">Geophysics</span>
-                                    <span class="topic-tag">Chemistry</span>
+                                <p>Comprehensive preparation for Geological Survey of India recruitment. Practice instantly with real exam patterns.</p>
+                                <div class="exam-features">
+                                    <div class="feature">📚 General Studies</div>
+                                    <div class="feature">⛰️ Geology</div>
+                                    <div class="feature">🌊 Geophysics</div>
+                                    <div class="feature">🧪 Chemistry</div>
                                 </div>
-                                <button class="btn btn--primary btn--full-width">Start GSI Preparation</button>
+                                <button class="btn btn--primary exam-btn">Start GSI Practice →</button>
                             </div>
                         </div>
                         
@@ -85,13 +123,14 @@
                             <div class="card__body">
                                 <div class="exam-icon">🎓</div>
                                 <h3>GATE Geology & Geophysics</h3>
-                                <p>Master GATE exam with extensive practice questions covering Common Section, Geology, and Geophysics with detailed explanations.</p>
-                                <div class="exam-topics">
-                                    <span class="topic-tag">Common Section</span>
-                                    <span class="topic-tag">Geology</span>
-                                    <span class="topic-tag">Geophysics</span>
+                                <p>Master the Graduate Aptitude Test with extensive question bank. No delays, instant feedback.</p>
+                                <div class="exam-features">
+                                    <div class="feature">📖 Common Section</div>
+                                    <div class="feature">🏔️ Geology</div>
+                                    <div class="feature">📡 Geophysics</div>
+                                    <div class="feature">🔬 Advanced Topics</div>
                                 </div>
-                                <button class="btn btn--primary btn--full-width">Start GATE Preparation</button>
+                                <button class="btn btn--primary exam-btn">Start GATE Practice →</button>
                             </div>
                         </div>
                     </div>
@@ -102,22 +141,11 @@
         <!-- Subject Selection Screen -->
         <div id="subjects" class="content-screen hidden">
             <div class="container">
-                <div class="subjects-header">
-                    <h1 id="exam-title">Select Subject</h1>
-                    <p>Choose a subject to start practicing</p>
+                <div class="section-header">
+                    <h1 id="exam-title">Select Subject Area</h1>
+                    <p>Choose your focus area and start practicing instantly</p>
                 </div>
                 <div id="subjects-grid" class="subjects-grid"></div>
-            </div>
-        </div>
-
-        <!-- Topic Selection Screen -->
-        <div id="topics" class="content-screen hidden">
-            <div class="container">
-                <div class="topics-header">
-                    <h1 id="subject-title">Select Topic</h1>
-                    <p>Choose a topic to practice questions</p>
-                </div>
-                <div id="topics-grid" class="topics-grid"></div>
             </div>
         </div>
 
@@ -127,37 +155,40 @@
                 <div class="question-container">
                     <div class="question-header">
                         <div class="question-meta">
-                            <span id="question-counter">Question 1 of 10</span>
-                            <button id="back-to-topics" class="btn btn--outline btn--sm">← Back to Topics</button>
+                            <span id="question-counter" class="counter-badge">Question 1 of 10</span>
+                            <button id="back-to-subjects" class="btn btn--outline btn--sm">← Back</button>
                         </div>
-                        <h2 id="topic-title">Topic</h2>
+                        <h2 id="topic-title" class="topic-name">Practice Questions</h2>
                     </div>
 
                     <div class="question-card card">
                         <div class="card__body">
-                            <div id="question-content">
-                                <h3 id="question-text">Loading question...</h3>
+                            <div id="question-content" class="question-section">
+                                <h3 id="question-text">Loading your first question...</h3>
                                 <div id="question-options" class="question-options"></div>
                             </div>
 
                             <div id="question-feedback" class="question-feedback hidden">
                                 <div id="feedback-message" class="feedback-message"></div>
-                                <div id="explanation" class="explanation"></div>
+                                <div id="explanation" class="explanation-text"></div>
                             </div>
 
                             <div class="question-actions">
                                 <button id="submit-answer" class="btn btn--primary" disabled>Submit Answer</button>
-                                <button id="next-question" class="btn btn--secondary hidden">Next Question</button>
-                                <button id="finish-topic" class="btn btn--secondary hidden">Finish Topic</button>
+                                <button id="next-question" class="btn btn--secondary hidden">Next Question →</button>
+                                <button id="finish-practice" class="btn btn--success hidden">Complete Practice ✓</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="topic-progress">
+                    <div class="progress-section">
                         <div class="progress-bar">
                             <div id="progress-fill" class="progress-fill"></div>
                         </div>
-                        <span id="progress-text">0% Complete</span>
+                        <div class="progress-info">
+                            <span id="progress-text">0% Complete</span>
+                            <span id="score-display">Score: 0/0</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -169,24 +200,37 @@
                 <div class="results-container">
                     <div class="results-card card">
                         <div class="card__body">
-                            <h2>🎉 Topic Completed!</h2>
+                            <div class="results-header">
+                                <h2>🎉 Practice Session Complete!</h2>
+                                <p>Excellent work! Here's your performance summary</p>
+                            </div>
+                            
                             <div class="results-stats">
                                 <div class="result-stat">
-                                    <span id="final-score" class="stat-number">8/10</span>
-                                    <span class="stat-label">Score</span>
+                                    <div class="stat-icon">🎯</div>
+                                    <span id="final-score" class="stat-number">0/0</span>
+                                    <span class="stat-label">Final Score</span>
                                 </div>
                                 <div class="result-stat">
-                                    <span id="final-accuracy" class="stat-number">80%</span>
-                                    <span class="stat-label">Accuracy</span>
+                                    <div class="stat-icon">📈</div>
+                                    <span id="final-accuracy" class="stat-number">0%</span>
+                                    <span class="stat-label">Accuracy Rate</span>
                                 </div>
                                 <div class="result-stat">
-                                    <span id="time-spent" class="stat-number">5m</span>
-                                    <span class="stat-label">Time Spent</span>
+                                    <div class="stat-icon">⏱️</div>
+                                    <span id="time-spent" class="stat-number">0m</span>
+                                    <span class="stat-label">Time Taken</span>
+                                </div>
+                                <div class="result-stat">
+                                    <div class="stat-icon">⭐</div>
+                                    <span id="performance-grade" class="stat-number">-</span>
+                                    <span class="stat-label">Grade</span>
                                 </div>
                             </div>
+                            
                             <div class="results-actions">
                                 <button id="practice-again" class="btn btn--primary">Practice Again</button>
-                                <button id="choose-new-topic" class="btn btn--secondary">Choose New Topic</button>
+                                <button id="new-subject" class="btn btn--secondary">Try Another Subject</button>
                                 <button id="back-to-dashboard" class="btn btn--outline">Back to Dashboard</button>
                             </div>
                         </div>
