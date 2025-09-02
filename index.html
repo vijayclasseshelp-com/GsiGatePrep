@@ -3,144 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GATE & GSI Prep Master - AI-Powered Exam Preparation</title>
+    <title>GATE & GSI Exam Preparation - Unlimited Practice Questions</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-                <span class="hamburger-line"></span>
-            </button>
-            <div class="header-title">
-                <h1>GATE & GSI Prep Master</h1>
-                <span class="header-subtitle">AI-Powered Question Generation</span>
+    <!-- Main Application - No Login Required -->
+    <div id="app-screen" class="screen">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <h2>🎓 GATE & GSI Prep Master</h2>
+                    </div>
+                    <div class="app-version">
+                        <span class="version-badge">v2.0 - Direct Access</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Breadcrumb Navigation -->
+        <nav id="breadcrumb" class="breadcrumb hidden">
+            <div class="container">
+                <div id="breadcrumb-content" class="breadcrumb-content"></div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard" class="content-screen">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Welcome to GATE & GSI Prep Master</h1>
+                    <p>No login required - Start practicing unlimited questions immediately</p>
+                </div>
+                
+                <div class="progress-overview">
+                    <div class="progress-card card">
+                        <div class="card__body">
+                            <h3>Your Progress</h3>
+                            <div class="progress-stats">
+                                <div class="stat">
+                                    <span class="stat-number" id="total-questions">0</span>
+                                    <span class="stat-label">Questions Attempted</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="accuracy-rate">0%</span>
+                                    <span class="stat-label">Accuracy</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="topics-completed">0</span>
+                                    <span class="stat-label">Topics Completed</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-number" id="study-streak">0</span>
+                                    <span class="stat-label">Day Streak</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exam-selection">
+                    <div class="exam-cards">
+                        <div class="exam-card card" data-exam="GSI">
+                            <div class="card__body">
+                                <div class="exam-icon">🌍</div>
+                                <h3>GSI Combined Geo-Scientist</h3>
+                                <p>Complete preparation for GSI recruitment exam with comprehensive question banks covering General Studies, Geology, Geophysics, and Chemistry.</p>
+                                <div class="exam-topics">
+                                    <span class="topic-tag">General Studies</span>
+                                    <span class="topic-tag">Geology & Hydrogeology</span>
+                                    <span class="topic-tag">Geophysics</span>
+                                    <span class="topic-tag">Chemistry</span>
+                                </div>
+                                <button class="btn btn--primary btn--full-width">Start GSI Preparation</button>
+                            </div>
+                        </div>
+                        
+                        <div class="exam-card card" data-exam="GATE">
+                            <div class="card__body">
+                                <div class="exam-icon">🎓</div>
+                                <h3>GATE Geology & Geophysics</h3>
+                                <p>Master GATE exam with extensive practice questions covering Common Section, Geology, and Geophysics with detailed explanations.</p>
+                                <div class="exam-topics">
+                                    <span class="topic-tag">Common Section</span>
+                                    <span class="topic-tag">Geology</span>
+                                    <span class="topic-tag">Geophysics</span>
+                                </div>
+                                <button class="btn btn--primary btn--full-width">Start GATE Preparation</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-content">
-                <!-- Exam Type Selection -->
-                <div class="exam-selector">
-                    <h3>Select Exam</h3>
-                    <div class="exam-buttons">
-                        <button class="exam-btn" data-exam="GSI">GSI</button>
-                        <button class="exam-btn" data-exam="GATE">GATE</button>
-                    </div>
+        <!-- Subject Selection Screen -->
+        <div id="subjects" class="content-screen hidden">
+            <div class="container">
+                <div class="subjects-header">
+                    <h1 id="exam-title">Select Subject</h1>
+                    <p>Choose a subject to start practicing</p>
                 </div>
-
-                <!-- Subject Selection -->
-                <div class="subject-selector" id="subjectSelector" style="display: none;">
-                    <h3>Select Subject</h3>
-                    <div class="subject-list" id="subjectList"></div>
-                </div>
-
-                <!-- Topic Navigation -->
-                <div class="topic-navigation" id="topicNavigation" style="display: none;">
-                    <div class="topic-search">
-                        <input type="text" placeholder="Search topics..." id="topicSearch" class="form-control">
-                    </div>
-                    <div class="topic-list" id="topicList"></div>
-                </div>
+                <div id="subjects-grid" class="subjects-grid"></div>
             </div>
-        </aside>
+        </div>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Welcome Screen -->
-            <div class="welcome-screen" id="welcomeScreen">
-                <div class="welcome-content">
-                    <div class="welcome-header">
-                        <h2>Welcome to GATE & GSI Prep Master</h2>
-                        <p class="welcome-description">
-                            Prepare for GATE and GSI examinations with AI-powered question generation. 
-                            Get unlimited practice questions with detailed explanations for every topic.
-                        </p>
+        <!-- Topic Selection Screen -->
+        <div id="topics" class="content-screen hidden">
+            <div class="container">
+                <div class="topics-header">
+                    <h1 id="subject-title">Select Topic</h1>
+                    <p>Choose a topic to practice questions</p>
+                </div>
+                <div id="topics-grid" class="topics-grid"></div>
+            </div>
+        </div>
+
+        <!-- Questions Screen -->
+        <div id="questions" class="content-screen hidden">
+            <div class="container">
+                <div class="question-container">
+                    <div class="question-header">
+                        <div class="question-meta">
+                            <span id="question-counter">Question 1 of 10</span>
+                            <button id="back-to-topics" class="btn btn--outline btn--sm">← Back to Topics</button>
+                        </div>
+                        <h2 id="topic-title">Topic</h2>
                     </div>
-                    
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">🤖</div>
-                            <h3>AI-Generated Questions</h3>
-                            <p>Unlimited practice questions tailored to your selected topics</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">💡</div>
-                            <h3>Detailed Explanations</h3>
-                            <p>Comprehensive explanations for every answer to enhance learning</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">📚</div>
-                            <h3>Complete Syllabus</h3>
-                            <p>Covers entire GATE and GSI syllabus with topic-wise practice</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">📱</div>
-                            <h3>Mobile Friendly</h3>
-                            <p>Practice anywhere with responsive design optimized for all devices</p>
+
+                    <div class="question-card card">
+                        <div class="card__body">
+                            <div id="question-content">
+                                <h3 id="question-text">Loading question...</h3>
+                                <div id="question-options" class="question-options"></div>
+                            </div>
+
+                            <div id="question-feedback" class="question-feedback hidden">
+                                <div id="feedback-message" class="feedback-message"></div>
+                                <div id="explanation" class="explanation"></div>
+                            </div>
+
+                            <div class="question-actions">
+                                <button id="submit-answer" class="btn btn--primary" disabled>Submit Answer</button>
+                                <button id="next-question" class="btn btn--secondary hidden">Next Question</button>
+                                <button id="finish-topic" class="btn btn--secondary hidden">Finish Topic</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="get-started">
-                        <p><strong>Get Started:</strong> Select an exam type from the sidebar to begin your preparation journey.</p>
+                    <div class="topic-progress">
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <span id="progress-text">0% Complete</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Topic Interface -->
-            <div class="topic-interface" id="topicInterface" style="display: none;">
-                <div class="topic-header">
-                    <h2 id="topicTitle">Select a Topic</h2>
-                    <p id="topicDescription">Choose a topic from the sidebar to start practicing</p>
-                    <div class="topic-actions">
-                        <button class="btn btn--secondary" id="explainConceptBtn">
-                            💡 Explain Concept
-                        </button>
-                        <button class="btn btn--primary" id="generateQuestionsBtn">
-                            🎯 Generate Questions
-                        </button>
+        <!-- Results Screen -->
+        <div id="results" class="content-screen hidden">
+            <div class="container">
+                <div class="results-container">
+                    <div class="results-card card">
+                        <div class="card__body">
+                            <h2>🎉 Topic Completed!</h2>
+                            <div class="results-stats">
+                                <div class="result-stat">
+                                    <span id="final-score" class="stat-number">8/10</span>
+                                    <span class="stat-label">Score</span>
+                                </div>
+                                <div class="result-stat">
+                                    <span id="final-accuracy" class="stat-number">80%</span>
+                                    <span class="stat-label">Accuracy</span>
+                                </div>
+                                <div class="result-stat">
+                                    <span id="time-spent" class="stat-number">5m</span>
+                                    <span class="stat-label">Time Spent</span>
+                                </div>
+                            </div>
+                            <div class="results-actions">
+                                <button id="practice-again" class="btn btn--primary">Practice Again</button>
+                                <button id="choose-new-topic" class="btn btn--secondary">Choose New Topic</button>
+                                <button id="back-to-dashboard" class="btn btn--outline">Back to Dashboard</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Loading State -->
-                <div class="loading-state" id="loadingState" style="display: none;">
-                    <div class="loading-spinner"></div>
-                    <p>Generating questions with AI...</p>
-                </div>
-
-                <!-- Questions Container -->
-                <div class="questions-container" id="questionsContainer"></div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Modal for Explanations -->
-    <div class="modal hidden" id="explanationModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Explanation</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <div class="modal-loading" id="modalLoading">
-                    <div class="loading-spinner"></div>
-                    <p>Generating explanation...</p>
-                </div>
-                <div class="modal-content-text" id="modalContent" style="display: none;"></div>
             </div>
         </div>
     </div>
-
-    <!-- Overlay -->
-    <div class="overlay hidden" id="overlay"></div>
 
     <script src="app.js"></script>
 </body>

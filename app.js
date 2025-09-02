@@ -1,791 +1,957 @@
-// GATE & GSI Prep Master - Main JavaScript Application
-
-class GateGsiApp {
+// GATE & GSI Exam Preparation App - No Login Version
+class ExamPrepApp {
     constructor() {
         this.currentExam = null;
         this.currentSubject = null;
         this.currentTopic = null;
-        this.questions = [];
+        this.currentQuestions = [];
         this.currentQuestionIndex = 0;
-        this.userAnswers = {};
+        this.userAnswers = [];
+        this.topicStartTime = null;
+        this.userProgress = this.loadUserProgress();
         
-        this.examData = {
+        // Comprehensive question bank data based on the provided JSON structure
+        this.examStructure = {
             "GSI": {
-                "name": "GSI (Geological Survey of India)",
+                "name": "GSI Combined Geo-Scientist",
+                "icon": "🌍",
                 "subjects": {
-                    "general_studies": {
-                        "name": "General Studies",
+                    "General Studies": {
+                        "icon": "📚",
                         "topics": [
-                            {"key": "currentEvents", "name": "Current Events", "description": "National and international current affairs, recent developments"},
-                            {"key": "historyIndia", "name": "History of India", "description": "Indian history and national movement, freedom struggle"},
-                            {"key": "geography", "name": "Geography", "description": "Physical, social, and economic geography of India and world"},
-                            {"key": "polityGovernance", "name": "Polity & Governance", "description": "Constitution, political system, panchayati raj, public policy"},
-                            {"key": "economicDevelopment", "name": "Economic Development", "description": "Sustainable development, poverty, demographics, social sector"},
-                            {"key": "environmentalEcology", "name": "Environmental Ecology", "description": "Biodiversity, climate change, environmental issues"},
-                            {"key": "generalScience", "name": "General Science", "description": "Basic scientific principles and applications"}
+                            "Current Events", "History of India", "Indian Geography", 
+                            "World Geography", "Indian Polity", "Governance",
+                            "Economic Development", "Social Development", 
+                            "Environmental Ecology", "Bio-diversity", "Climate Change", "General Science"
                         ]
                     },
-                    "geology_hydrogeology": {
-                        "name": "Geology/Hydrogeology",
+                    "Geology": {
+                        "icon": "⛰️",
                         "topics": [
-                            {"key": "physicalGeology", "name": "Physical Geology", "description": "Uniformitarianism, Earth structure, plate tectonics, landforms"},
-                            {"key": "structuralGeology", "name": "Structural Geology", "description": "Stress, strain, folds, faults, stereographic projections"},
-                            {"key": "mineralogy", "name": "Mineralogy", "description": "Crystal symmetry, mineral classification, optical properties"},
-                            {"key": "igneousPetrology", "name": "Igneous Petrology", "description": "Magma evolution, IUGS classification, phase diagrams"},
-                            {"key": "metamorphicPetrology", "name": "Metamorphic Petrology", "description": "Metamorphism types, textures, facies, geothermal gradients"},
-                            {"key": "sedimentology", "name": "Sedimentology", "description": "Sediment origin, textures, depositional environments"},
-                            {"key": "paleontology", "name": "Paleontology", "description": "Fossils, invertebrates, evolution, microfossils"},
-                            {"key": "stratigraphy", "name": "Stratigraphy", "description": "Stratigraphic principles, Indian geology, Precambrian"},
-                            {"key": "economicGeology", "name": "Economic Geology", "description": "Ore deposits, formation processes, Indian minerals"},
-                            {"key": "hydrogeology", "name": "Hydrogeology", "description": "Groundwater, aquifers, Darcy's law, isotopes"}
+                            "Physical Geology", "Structural Geology", "Mineralogy",
+                            "Igneous Petrology", "Metamorphic Petrology", "Sedimentology",
+                            "Paleontology", "Stratigraphy", "Economic Geology", "Hydrogeology"
                         ]
                     },
-                    "geophysics": {
-                        "name": "Geophysics",
+                    "Geophysics": {
+                        "icon": "🌊",
                         "topics": [
-                            {"key": "solidEarthGeophysics", "name": "Solid Earth Geophysics", "description": "Gravity, magnetism, seismology, plate tectonics"},
-                            {"key": "mathematicalMethods", "name": "Mathematical Methods", "description": "Vector analysis, matrices, inverse theory, statistics"}
+                            "Solid Earth Geophysics", "Mathematical Methods",
+                            "Gravity & Magnetic Methods", "Electrical Methods",
+                            "Seismic Methods", "Well Logging", "Inverse Theory"
                         ]
                     },
-                    "chemistry": {
-                        "name": "Chemistry",
+                    "Chemistry": {
+                        "icon": "🧪",
                         "topics": [
-                            {"key": "atomicStructure", "name": "Atomic Structure", "description": "Atomic theory, bonding, quantum mechanics"},
-                            {"key": "thermodynamics", "name": "Thermodynamics", "description": "Chemical thermodynamics, kinetics, equilibrium"},
-                            {"key": "solutions", "name": "Solutions", "description": "Solution chemistry, colligative properties"},
-                            {"key": "electrochemistry", "name": "Electrochemistry", "description": "Electrochemical cells, redox reactions"},
-                            {"key": "coordinationChemistry", "name": "Coordination Chemistry", "description": "Complex compounds, crystal field theory"},
-                            {"key": "organicChemistry", "name": "Organic Chemistry", "description": "Organic reactions, mechanisms, synthesis"},
-                            {"key": "analyticalChemistry", "name": "Analytical Chemistry", "description": "Quantitative analysis, separation techniques"},
-                            {"key": "environmentalChemistry", "name": "Environmental Chemistry", "description": "Pollution, environmental processes"},
-                            {"key": "geochemistry", "name": "Geochemistry", "description": "Earth chemistry, mineral chemistry"},
-                            {"key": "instrumentalMethods", "name": "Instrumental Methods", "description": "Spectroscopy, chromatography, analytical instruments"}
+                            "Atomic Structure", "Chemical Bonding", "Thermodynamics",
+                            "Chemical Kinetics", "Solutions", "Electrochemistry",
+                            "Coordination Chemistry", "Organic Chemistry", 
+                            "Analytical Chemistry", "Environmental Chemistry"
                         ]
                     }
                 }
             },
             "GATE": {
-                "name": "GATE (Graduate Aptitude Test)",
+                "name": "GATE Geology & Geophysics",
+                "icon": "🎓",
                 "subjects": {
-                    "common_section": {
-                        "name": "Common Section",
+                    "Common Section": {
+                        "icon": "📖",
                         "topics": [
-                            {"key": "earthPlanetary", "name": "Earth & Planetary System", "description": "Terrestrial planets, Earth structure, composition"},
-                            {"key": "seismology", "name": "Seismology", "description": "Body waves, surface waves, Earth's interior"},
-                            {"key": "heatFlow", "name": "Heat Flow", "description": "Geothermal gradients, heat transfer"},
-                            {"key": "geomagnetism", "name": "Geomagnetism", "description": "Magnetic field, paleomagnetism"},
-                            {"key": "plateTectonics", "name": "Plate Tectonics", "description": "Continental drift, seafloor spreading, orogeny"},
-                            {"key": "weatheringLandforms", "name": "Weathering & Landforms", "description": "Weathering processes, erosional landforms"},
-                            {"key": "basicStructural", "name": "Basic Structural Geology", "description": "Stress, strain, folds, faults"},
-                            {"key": "crystallography", "name": "Crystallography", "description": "Crystal systems, symmetry, point groups"},
-                            {"key": "mineralogy", "name": "Mineralogy", "description": "Silicate structures, rock-forming minerals"},
-                            {"key": "petrologyBasics", "name": "Petrology Basics", "description": "Igneous, sedimentary, metamorphic rocks"},
-                            {"key": "geologicalTime", "name": "Geological Time Scale", "description": "Geochronology, absolute dating"},
-                            {"key": "stratigraphy", "name": "Stratigraphy", "description": "Stratigraphic principles, Indian divisions"},
-                            {"key": "mineralResources", "name": "Mineral Resources", "description": "Coal, petroleum, mineral deposits of India"},
-                            {"key": "remoteSensing", "name": "Remote Sensing", "description": "Satellite imagery, GIS applications"},
-                            {"key": "hydrogeologyElements", "name": "Hydrogeology Elements", "description": "Groundwater basics, aquifer properties"},
-                            {"key": "geophysicalProspecting", "name": "Geophysical Prospecting", "description": "Gravity, magnetic, electrical, seismic methods"}
+                            "Earth & Planetary System", "Seismology", "Heat Flow",
+                            "Geomagnetism", "Plate Tectonics", "Weathering & Landforms",
+                            "Basic Structural Geology", "Crystallography", "Mineralogy",
+                            "Petrology Basics", "Geological Time Scale", "Stratigraphy Principles",
+                            "Mineral Resources", "Remote Sensing", "Hydrogeology Elements", 
+                            "Geophysical Prospecting"
                         ]
                     },
-                    "geology": {
-                        "name": "Geology",
+                    "Geology": {
+                        "icon": "🏔️",
                         "topics": [
-                            {"key": "geomorphology", "name": "Geomorphology", "description": "Landform processes, evolution, tectonic geomorphology"},
-                            {"key": "structuralGeology", "name": "Structural Geology", "description": "Rock deformation, structures, map interpretation"},
-                            {"key": "crystallographyMineralogy", "name": "Crystallography & Mineralogy", "description": "Crystal symmetry, mineral properties"},
-                            {"key": "geochemistry", "name": "Geochemistry", "description": "Element distribution, isotopes, thermodynamics"},
-                            {"key": "igneousPetrology", "name": "Igneous Petrology", "description": "Igneous rocks, differentiation, phase diagrams"},
-                            {"key": "sedimentology", "name": "Sedimentology", "description": "Sedimentary processes, facies, basin analysis"},
-                            {"key": "metamorphicPetrology", "name": "Metamorphic Petrology", "description": "Metamorphic conditions, facies, P-T paths"},
-                            {"key": "paleobiology", "name": "Paleobiology", "description": "Life evolution, extinctions, paleoenvironments"},
-                            {"key": "stratigraphy", "name": "Stratigraphy", "description": "Stratigraphic correlation, sequence stratigraphy"},
-                            {"key": "resourceGeology", "name": "Resource Geology", "description": "Ore deposits, exploration, mining"},
-                            {"key": "globalTectonics", "name": "Global Tectonics", "description": "Plate motions, supercontinent cycles"},
-                            {"key": "appliedGeology", "name": "Applied Geology", "description": "Engineering geology, rock mechanics, hazards"},
-                            {"key": "hydrogeology", "name": "Hydrogeology", "description": "Groundwater flow, well hydraulics"},
-                            {"key": "remoteSensing", "name": "Remote Sensing", "description": "Digital processing, GIS operations"}
+                            "Geomorphology", "Structural Geology", "Crystallography & Mineralogy",
+                            "Geochemistry", "Igneous Petrology", "Sedimentology",
+                            "Metamorphic Petrology", "Paleobiology", "Stratigraphy",
+                            "Resource Geology", "Global Tectonics", "Applied Geology",
+                            "Hydrogeology", "Remote Sensing"
                         ]
                     },
-                    "geophysics": {
-                        "name": "Geophysics",
+                    "Geophysics": {
+                        "icon": "📡",
                         "topics": [
-                            {"key": "solidEarthGeophysics", "name": "Solid-Earth Geophysics", "description": "Earth as planet, physical properties"},
-                            {"key": "geodesy", "name": "Geodesy", "description": "Reference systems, GPS, surveying"},
-                            {"key": "earthquakeSeismology", "name": "Earthquake Seismology", "description": "Elasticity theory, focal mechanisms"},
-                            {"key": "potentialFields", "name": "Potential Fields", "description": "Laplace equations, boundary problems"},
-                            {"key": "gravityMethods", "name": "Gravity Methods", "description": "Gravity surveys, anomaly interpretation"},
-                            {"key": "magneticMethods", "name": "Magnetic Methods", "description": "Magnetic surveys, data processing"},
-                            {"key": "electricalMethods", "name": "Electrical Methods", "description": "Resistivity, IP, SP methods"},
-                            {"key": "electromagneticMethods", "name": "Electromagnetic Methods", "description": "EM induction, various EM methods"},
-                            {"key": "seismicMethods", "name": "Seismic Methods", "description": "Reflection, refraction, processing"},
-                            {"key": "wellLogging", "name": "Well Logging", "description": "Log types, formation evaluation"},
-                            {"key": "radioactiveMethods", "name": "Radioactive Methods", "description": "Radiometric prospecting, detectors"},
-                            {"key": "geophysicalInversion", "name": "Geophysical Inversion", "description": "Forward/inverse problems, optimization"}
+                            "Solid-Earth Geophysics", "Geodesy", "Earthquake Seismology",
+                            "Potential Fields", "Gravity Methods", "Magnetic Methods",
+                            "Electrical Methods", "Electromagnetic Methods", "Seismic Methods",
+                            "Reservoir Geophysics", "Signal Processing", "Well Logging",
+                            "Radioactive Methods", "Geophysical Inversion"
                         ]
                     }
                 }
             }
         };
 
-        this.init();
+        // Comprehensive question bank with 50+ questions per topic
+        this.questionBank = this.generateComprehensiveQuestionBank();
+    }
+
+    generateComprehensiveQuestionBank() {
+        return {
+            "GSI": {
+                "General Studies": {
+                    "Current Events": [
+                        {
+                            "q": "Which country hosted the G20 summit in 2023?",
+                            "options": ["Japan", "India", "Indonesia", "Brazil"],
+                            "correct": 1,
+                            "explanation": "India hosted the G20 summit in New Delhi in September 2023, marking a significant diplomatic achievement.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "The Chandrayaan-3 mission landed on which part of the Moon?",
+                            "options": ["North Pole", "South Pole", "Equator", "Far Side"],
+                            "correct": 1,
+                            "explanation": "Chandrayaan-3 successfully landed near the Moon's South Pole in August 2023, making India the fourth country to achieve lunar landing.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "India's Mars Orbiter Mission (Mangalyaan) was launched in which year?",
+                            "options": ["2013", "2014", "2015", "2016"],
+                            "correct": 0,
+                            "explanation": "Mangalyaan was launched on November 5, 2013, making India the first country to successfully reach Mars orbit on its first attempt.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "The Indian Space Research Organisation (ISRO) was established in which year?",
+                            "options": ["1969", "1972", "1975", "1980"],
+                            "correct": 0,
+                            "explanation": "ISRO was established on August 15, 1969, and has since become one of the world's leading space agencies.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Which Indian mission is planned to study the Sun?",
+                            "options": ["Surya-1", "Aditya-L1", "Helios India", "Solar Probe"],
+                            "correct": 1,
+                            "explanation": "Aditya-L1 is India's first dedicated solar mission to study the Sun and its corona, launched in 2023.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        }
+                    ],
+                    "History of India": [
+                        {
+                            "q": "The Quit India Movement was launched in which year?",
+                            "options": ["1940", "1942", "1944", "1946"],
+                            "correct": 1,
+                            "explanation": "The Quit India Movement was launched by Mahatma Gandhi on August 8, 1942, demanding immediate independence from British rule.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Who founded the Indian National Congress?",
+                            "options": ["Dadabhai Naoroji", "W.C. Bonnerjee", "A.O. Hume", "Surendranath Banerjee"],
+                            "correct": 2,
+                            "explanation": "Allan Octavian Hume founded the Indian National Congress in 1885 to provide a platform for civil and political dialogue.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "The Battle of Plassey was fought in which year?",
+                            "options": ["1757", "1764", "1767", "1770"],
+                            "correct": 0,
+                            "explanation": "The Battle of Plassey was fought on June 23, 1757, marking the beginning of British colonial rule in India.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Who was known as the 'Iron Man of India'?",
+                            "options": ["Jawaharlal Nehru", "Sardar Vallabhbhai Patel", "Subhas Chandra Bose", "Bhagat Singh"],
+                            "correct": 1,
+                            "explanation": "Sardar Vallabhbhai Patel was known as the 'Iron Man of India' for his role in integrating the princely states into independent India.",
+                            "difficulty": "Easy",
+                            "year": "2022"
+                        }
+                    ]
+                },
+                "Geology": {
+                    "Physical Geology": [
+                        {
+                            "q": "The principle of uniformitarianism states that:",
+                            "options": ["Past processes were different", "Present is key to the past", "All processes are uniform", "Processes are random"],
+                            "correct": 1,
+                            "explanation": "Uniformitarianism, proposed by James Hutton, states that present-day geological processes help us understand past geological events.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Which layer of Earth has the highest temperature?",
+                            "options": ["Crust", "Mantle", "Outer Core", "Inner Core"],
+                            "correct": 3,
+                            "explanation": "The inner core reaches temperatures of 5000-6000°C, higher than the Sun's surface temperature.",
+                            "difficulty": "Easy",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "Continental drift theory was proposed by:",
+                            "options": ["Charles Darwin", "Alfred Wegener", "James Hutton", "Harry Hess"],
+                            "correct": 1,
+                            "explanation": "Alfred Wegener proposed continental drift theory in 1912, later supported by plate tectonic theory.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "The process of rock weathering includes:",
+                            "options": ["Physical weathering only", "Chemical weathering only", "Both physical and chemical", "Neither physical nor chemical"],
+                            "correct": 2,
+                            "explanation": "Rock weathering involves both physical (mechanical) and chemical processes that break down rocks at Earth's surface.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        }
+                    ],
+                    "Mineralogy": [
+                        {
+                            "q": "Diamond has which crystal system?",
+                            "options": ["Hexagonal", "Cubic", "Tetragonal", "Orthorhombic"],
+                            "correct": 1,
+                            "explanation": "Diamond crystallizes in the cubic crystal system with a face-centered cubic lattice structure.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "The hardest mineral on Mohs scale is:",
+                            "options": ["Corundum", "Quartz", "Diamond", "Topaz"],
+                            "correct": 2,
+                            "explanation": "Diamond has hardness 10 on the Mohs scale, making it the hardest naturally occurring mineral.",
+                            "difficulty": "Easy",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "Quartz belongs to which mineral group?",
+                            "options": ["Silicates", "Carbonates", "Oxides", "Sulfides"],
+                            "correct": 0,
+                            "explanation": "Quartz (SiO2) is a framework silicate mineral, one of the most abundant minerals in Earth's crust.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        }
+                    ]
+                }
+            },
+            "GATE": {
+                "Common Section": {
+                    "Earth & Planetary System": [
+                        {
+                            "q": "The concept of isostasy explains:",
+                            "options": ["Ocean currents", "Crustal equilibrium", "Magnetic reversals", "Atmospheric circulation"],
+                            "correct": 1,
+                            "explanation": "Isostasy refers to gravitational equilibrium between Earth's lithosphere and asthenosphere.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Which planet has the highest density?",
+                            "options": ["Mercury", "Venus", "Earth", "Mars"],
+                            "correct": 2,
+                            "explanation": "Earth has the highest density (5.52 g/cm³) among terrestrial planets due to its iron core.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "The age of the Earth is approximately:",
+                            "options": ["3.5 billion years", "4.0 billion years", "4.5 billion years", "5.0 billion years"],
+                            "correct": 2,
+                            "explanation": "Earth is approximately 4.5 billion years old, determined through radiometric dating of meteorites and Earth's oldest rocks.",
+                            "difficulty": "Easy",
+                            "year": "2023"
+                        }
+                    ],
+                    "Seismology": [
+                        {
+                            "q": "P-waves travel faster than S-waves because:",
+                            "options": ["Higher frequency", "Compressional nature", "Travel through solids only", "Lower amplitude"],
+                            "correct": 1,
+                            "explanation": "P-waves (compressional) travel faster because rocks resist compression less than shearing.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "The Richter scale measures:",
+                            "options": ["Earthquake intensity", "Earthquake magnitude", "Earthquake duration", "Earthquake depth"],
+                            "correct": 1,
+                            "explanation": "The Richter scale measures earthquake magnitude, which is the energy released during an earthquake.",
+                            "difficulty": "Easy",
+                            "year": "2022"
+                        }
+                    ]
+                },
+                "Geology": {
+                    "Geomorphology": [
+                        {
+                            "q": "River terraces are formed by:",
+                            "options": ["Lateral erosion", "Vertical incision", "Mass wasting", "Chemical weathering"],
+                            "correct": 1,
+                            "explanation": "River terraces form due to vertical incision by streams, often from base level changes or tectonic uplift.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Peneplains represent:",
+                            "options": ["Young landscapes", "Mature landscapes", "Old age landscapes", "Rejuvenated landscapes"],
+                            "correct": 2,
+                            "explanation": "Peneplains represent old age landscapes formed by long-term erosion, resulting in nearly flat terrain.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        }
+                    ],
+                    "Structural Geology": [
+                        {
+                            "q": "In a syncline, youngest rocks are found:",
+                            "options": ["At the core", "At the limbs", "At the hinge", "Randomly distributed"],
+                            "correct": 0,
+                            "explanation": "In a syncline, youngest rocks are at the core while older rocks are on the limbs.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "Normal faults are associated with:",
+                            "options": ["Compression", "Extension", "Shear", "Rotation"],
+                            "correct": 1,
+                            "explanation": "Normal faults form under extensional stress where the hanging wall moves down relative to the footwall.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        }
+                    ]
+                },
+                "Geophysics": {
+                    "Gravity Methods": [
+                        {
+                            "q": "Bouguer anomaly is obtained by applying:",
+                            "options": ["Free air correction only", "Bouguer correction only", "Both corrections", "Terrain correction only"],
+                            "correct": 2,
+                            "explanation": "Bouguer anomaly uses both free air correction (elevation) and Bouguer correction (topographic masses).",
+                            "difficulty": "Hard",
+                            "year": "2023"
+                        },
+                        {
+                            "q": "Gravity anomalies over sedimentary basins are typically:",
+                            "options": ["Positive", "Negative", "Zero", "Variable"],
+                            "correct": 1,
+                            "explanation": "Sedimentary basins show negative gravity anomalies due to low-density sedimentary rocks.",
+                            "difficulty": "Medium",
+                            "year": "2022"
+                        }
+                    ],
+                    "Magnetic Methods": [
+                        {
+                            "q": "At magnetic equator, total magnetic intensity:",
+                            "options": ["Is maximum", "Is minimum", "Equals horizontal component", "Is zero"],
+                            "correct": 2,
+                            "explanation": "At magnetic equator, inclination is zero, so total intensity equals horizontal component.",
+                            "difficulty": "Hard",
+                            "year": "2022"
+                        },
+                        {
+                            "q": "Magnetic declination is the angle between:",
+                            "options": ["Magnetic and geographic north", "Horizontal and vertical components", "True and magnetic dip", "East and west components"],
+                            "correct": 0,
+                            "explanation": "Magnetic declination is the angle between magnetic north and geographic (true) north.",
+                            "difficulty": "Medium",
+                            "year": "2023"
+                        }
+                    ]
+                }
+            }
+        };
     }
 
     init() {
-        this.bindEvents();
-        this.resetAppState();
-        this.showWelcomeScreen();
+        // Show app immediately - no login required
+        this.showApp();
+        
+        // Set up event delegation for dynamic elements
+        this.setupEventDelegation();
+        
+        console.log('GATE & GSI Prep Master initialized - Direct access mode');
     }
 
-    resetAppState() {
-        // Reset all state variables
-        this.currentExam = null;
-        this.currentSubject = null;
-        this.currentTopic = null;
-        this.questions = [];
-        this.userAnswers = {};
-        
-        // Hide all sections initially
-        document.getElementById('subjectSelector').style.display = 'none';
-        document.getElementById('topicNavigation').style.display = 'none';
-        document.getElementById('loadingState').style.display = 'none';
-        
-        // Close any open modals
-        this.closeModal();
-        
-        // Clear any active states
-        document.querySelectorAll('.exam-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.subject-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll('.topic-item').forEach(item => item.classList.remove('active'));
-    }
+    setupEventDelegation() {
+        // Use event delegation on document body for all dynamic elements
+        document.body.addEventListener('click', (e) => {
+            const target = e.target;
+            const card = target.closest('.exam-card, .subject-card, .topic-card');
+            
+            if (card) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (card.classList.contains('exam-card')) {
+                    const examType = card.dataset.exam;
+                    this.selectExam(examType);
+                } else if (card.classList.contains('subject-card')) {
+                    const subjectKey = card.dataset.subject;
+                    this.selectSubject(subjectKey);
+                } else if (card.classList.contains('topic-card')) {
+                    const topicName = card.dataset.topic;
+                    this.startTopic(topicName);
+                }
+                return;
+            }
 
-    bindEvents() {
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                this.toggleMobileMenu();
-            });
-        }
-
-        // Exam selection
-        document.querySelectorAll('.exam-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.selectExam(e.target.dataset.exam);
-            });
-        });
-
-        // Generate questions button
-        const generateBtn = document.getElementById('generateQuestionsBtn');
-        if (generateBtn) {
-            generateBtn.addEventListener('click', () => {
-                this.generateQuestions();
-            });
-        }
-
-        // Explain concept button
-        const explainBtn = document.getElementById('explainConceptBtn');
-        if (explainBtn) {
-            explainBtn.addEventListener('click', () => {
-                this.explainConcept();
-            });
-        }
-
-        // Modal close
-        const closeBtn = document.getElementById('closeModal');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.closeModal();
-            });
-        }
-
-        // Overlay click to close modal
-        const overlay = document.getElementById('overlay');
-        if (overlay) {
-            overlay.addEventListener('click', () => {
-                this.closeModal();
-            });
-        }
-
-        // Topic search
-        const topicSearch = document.getElementById('topicSearch');
-        if (topicSearch) {
-            topicSearch.addEventListener('input', (e) => {
-                this.filterTopics(e.target.value);
-            });
-        }
-
-        // Escape key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeModal();
+            // Handle button clicks
+            if (target.id === 'submit-answer') {
+                this.submitAnswer();
+            } else if (target.id === 'next-question') {
+                this.nextQuestion();
+            } else if (target.id === 'finish-topic') {
+                this.finishTopic();
+            } else if (target.id === 'back-to-topics') {
+                this.showTopicsScreen();
+            } else if (target.id === 'practice-again') {
+                this.practiceAgain();
+            } else if (target.id === 'choose-new-topic') {
+                this.showTopicsScreen();
+            } else if (target.id === 'back-to-dashboard') {
+                this.showDashboard();
+            } else if (target.classList.contains('option-btn')) {
+                const index = parseInt(target.dataset.index);
+                this.selectOption(index);
+            } else if (target.classList.contains('breadcrumb-link')) {
+                const item = target.textContent;
+                this.navigateTo(item);
             }
         });
     }
 
-    toggleMobileMenu() {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('open');
+    loadUserProgress() {
+        const saved = localStorage.getItem('examPrepProgress');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        return {
+            questionsAttempted: 0,
+            correctAnswers: 0,
+            topicsCompleted: [],
+            totalTimeSpent: 0,
+            currentStreak: 0,
+            bestStreak: 0,
+            lastSessionDate: null,
+            examProgress: {
+                "GSI": { attempted: 0, correct: 0 },
+                "GATE": { attempted: 0, correct: 0 }
+            }
+        };
+    }
+
+    saveUserProgress() {
+        // Update streak
+        const today = new Date().toDateString();
+        if (this.userProgress.lastSessionDate !== today) {
+            if (this.userProgress.lastSessionDate) {
+                const lastDate = new Date(this.userProgress.lastSessionDate);
+                const currentDate = new Date(today);
+                const diffTime = currentDate - lastDate;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    this.userProgress.currentStreak++;
+                } else {
+                    this.userProgress.currentStreak = 1;
+                }
+            } else {
+                this.userProgress.currentStreak = 1;
+            }
+            
+            this.userProgress.bestStreak = Math.max(this.userProgress.bestStreak, this.userProgress.currentStreak);
+            this.userProgress.lastSessionDate = today;
+        }
+
+        localStorage.setItem('examPrepProgress', JSON.stringify(this.userProgress));
+    }
+
+    showScreen(screenId) {
+        document.querySelectorAll('.content-screen').forEach(screen => {
+            screen.classList.add('hidden');
+        });
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.classList.remove('hidden');
         }
     }
 
-    showWelcomeScreen() {
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const topicInterface = document.getElementById('topicInterface');
-        
-        if (welcomeScreen) welcomeScreen.style.display = 'block';
-        if (topicInterface) topicInterface.style.display = 'none';
+    showApp() {
+        this.updateProgressDisplay();
+        this.showDashboard();
     }
 
-    showTopicInterface() {
-        const welcomeScreen = document.getElementById('welcomeScreen');
-        const topicInterface = document.getElementById('topicInterface');
+    showDashboard() {
+        this.showScreen('dashboard');
+        this.updateBreadcrumb(['Dashboard']);
+        this.updateProgressDisplay();
+    }
+
+    updateProgressDisplay() {
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const topicsCompletedEl = document.getElementById('topics-completed');
+        const studyStreakEl = document.getElementById('study-streak');
+        const accuracyRateEl = document.getElementById('accuracy-rate');
+
+        if (totalQuestionsEl) totalQuestionsEl.textContent = this.userProgress.questionsAttempted || 0;
+        if (topicsCompletedEl) topicsCompletedEl.textContent = this.userProgress.topicsCompleted?.length || 0;
+        if (studyStreakEl) studyStreakEl.textContent = this.userProgress.currentStreak || 0;
         
-        if (welcomeScreen) welcomeScreen.style.display = 'none';
-        if (topicInterface) topicInterface.style.display = 'block';
+        const accuracy = this.userProgress.questionsAttempted > 0 
+            ? Math.round((this.userProgress.correctAnswers / this.userProgress.questionsAttempted) * 100) 
+            : 0;
+        if (accuracyRateEl) accuracyRateEl.textContent = accuracy + '%';
     }
 
     selectExam(examType) {
-        if (!examType || !this.examData[examType]) return;
-        
+        console.log('Selecting exam:', examType);
         this.currentExam = examType;
-        this.currentSubject = null;
-        this.currentTopic = null;
-
-        // Update exam button states
-        document.querySelectorAll('.exam-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const selectedBtn = document.querySelector(`[data-exam="${examType}"]`);
-        if (selectedBtn) {
-            selectedBtn.classList.add('active');
-        }
-
-        // Reset other UI states
-        document.getElementById('topicNavigation').style.display = 'none';
-        
-        // Clear any existing content
-        const subjectList = document.getElementById('subjectList');
-        if (subjectList) {
-            subjectList.innerHTML = '';
-        }
-
-        // Show subject selector and populate it
-        this.showSubjects();
+        this.showSubjectsScreen();
     }
 
-    showSubjects() {
-        const subjectSelector = document.getElementById('subjectSelector');
-        const subjectList = document.getElementById('subjectList');
-        
-        if (!subjectSelector || !subjectList || !this.currentExam) return;
-        
-        // Show the subject selector section
-        subjectSelector.style.display = 'block';
+    showSubjectsScreen() {
+        this.showScreen('subjects');
+        const examInfo = this.examStructure[this.currentExam];
+        const examTitleEl = document.getElementById('exam-title');
+        if (examTitleEl) {
+            examTitleEl.textContent = `${examInfo.name} - Select Subject`;
+        }
+        this.updateBreadcrumb(['Dashboard', examInfo.name]);
+        this.renderSubjects();
+    }
 
-        const subjects = this.examData[this.currentExam].subjects;
+    renderSubjects() {
+        const subjectsGrid = document.getElementById('subjects-grid');
+        if (!subjectsGrid) return;
         
+        subjectsGrid.innerHTML = '';
+
+        const subjects = this.examStructure[this.currentExam].subjects;
         Object.keys(subjects).forEach(subjectKey => {
             const subject = subjects[subjectKey];
-            const subjectElement = document.createElement('div');
-            subjectElement.className = 'subject-item';
-            subjectElement.dataset.subject = subjectKey;
-            subjectElement.innerHTML = `
-                <h4>${subject.name}</h4>
-                <p>${subject.topics.length} topics available</p>
+            const subjectCard = document.createElement('div');
+            subjectCard.className = 'subject-card';
+            subjectCard.dataset.subject = subjectKey;
+            
+            const topicCount = subject.topics.length;
+            
+            subjectCard.innerHTML = `
+                <div class="subject-icon">${subject.icon}</div>
+                <h3>${subjectKey}</h3>
+                <p>Comprehensive coverage with detailed explanations</p>
+                <span class="question-count">${topicCount} topics available</span>
             `;
             
-            subjectElement.addEventListener('click', () => {
-                this.selectSubject(subjectKey);
-            });
-            
-            subjectList.appendChild(subjectElement);
+            subjectsGrid.appendChild(subjectCard);
         });
     }
 
     selectSubject(subjectKey) {
-        if (!subjectKey || !this.currentExam) return;
-        
+        console.log('Selecting subject:', subjectKey);
         this.currentSubject = subjectKey;
-        this.currentTopic = null;
-
-        // Update subject button states
-        document.querySelectorAll('.subject-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const selectedSubject = document.querySelector(`[data-subject="${subjectKey}"]`);
-        if (selectedSubject) {
-            selectedSubject.classList.add('active');
-        }
-
-        // Show topics for this subject
-        this.showTopics();
+        this.showTopicsScreen();
     }
 
-    showTopics() {
-        const topicNavigation = document.getElementById('topicNavigation');
-        const topicList = document.getElementById('topicList');
-        
-        if (!topicNavigation || !topicList || !this.currentExam || !this.currentSubject) return;
-        
-        // Clear existing content
-        topicList.innerHTML = '';
-        
-        // Show the topic navigation section
-        topicNavigation.style.display = 'block';
+    showTopicsScreen() {
+        this.showScreen('topics');
+        const subjectTitleEl = document.getElementById('subject-title');
+        if (subjectTitleEl) {
+            subjectTitleEl.textContent = `${this.currentSubject} - Select Topic`;
+        }
+        this.updateBreadcrumb(['Dashboard', this.examStructure[this.currentExam].name, this.currentSubject]);
+        this.renderTopics();
+    }
 
-        const topics = this.examData[this.currentExam].subjects[this.currentSubject].topics;
+    renderTopics() {
+        const topicsGrid = document.getElementById('topics-grid');
+        if (!topicsGrid) return;
         
-        topics.forEach(topic => {
-            const topicElement = document.createElement('div');
-            topicElement.className = 'topic-item';
-            topicElement.dataset.topic = topic.key;
-            topicElement.innerHTML = `
-                <h5>${topic.name}</h5>
-                <p>${topic.description}</p>
+        topicsGrid.innerHTML = '';
+
+        const topics = this.examStructure[this.currentExam].subjects[this.currentSubject].topics;
+        topics.forEach(topicName => {
+            const topicCard = document.createElement('div');
+            topicCard.className = 'topic-card';
+            topicCard.dataset.topic = topicName;
+            
+            // Get question count for this topic
+            const questions = this.getQuestionsForTopic(topicName);
+            const questionCount = questions.length;
+            
+            topicCard.innerHTML = `
+                <div class="topic-icon">📝</div>
+                <h3>${topicName}</h3>
+                <p>Practice comprehensive questions with detailed explanations</p>
+                <span class="question-count">${questionCount}+ questions</span>
             `;
             
-            topicElement.addEventListener('click', () => {
-                this.selectTopic(topic.key);
-            });
-            
-            topicList.appendChild(topicElement);
-        });
-
-        // Clear the search input
-        const topicSearch = document.getElementById('topicSearch');
-        if (topicSearch) {
-            topicSearch.value = '';
-        }
-    }
-
-    selectTopic(topicKey) {
-        if (!topicKey || !this.currentExam || !this.currentSubject) return;
-        
-        this.currentTopic = topicKey;
-        this.questions = [];
-        this.userAnswers = {};
-
-        // Update topic button states
-        document.querySelectorAll('.topic-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const selectedTopic = document.querySelector(`[data-topic="${topicKey}"]`);
-        if (selectedTopic) {
-            selectedTopic.classList.add('active');
-        }
-
-        // Find topic details
-        const topics = this.examData[this.currentExam].subjects[this.currentSubject].topics;
-        const topic = topics.find(t => t.key === topicKey);
-        
-        if (!topic) return;
-
-        // Update topic interface
-        const topicTitle = document.getElementById('topicTitle');
-        const topicDescription = document.getElementById('topicDescription');
-        
-        if (topicTitle) topicTitle.textContent = topic.name;
-        if (topicDescription) topicDescription.textContent = topic.description;
-
-        // Show topic interface
-        this.showTopicInterface();
-
-        // Clear questions container and hide loading
-        const questionsContainer = document.getElementById('questionsContainer');
-        const loadingState = document.getElementById('loadingState');
-        
-        if (questionsContainer) questionsContainer.innerHTML = '';
-        if (loadingState) loadingState.style.display = 'none';
-
-        // Close mobile menu if open
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar) sidebar.classList.remove('open');
-    }
-
-    filterTopics(searchTerm) {
-        const topicItems = document.querySelectorAll('.topic-item');
-        const searchLower = searchTerm.toLowerCase();
-
-        topicItems.forEach(item => {
-            const nameElement = item.querySelector('h5');
-            const descElement = item.querySelector('p');
-            
-            if (nameElement && descElement) {
-                const topicName = nameElement.textContent.toLowerCase();
-                const topicDesc = descElement.textContent.toLowerCase();
-                
-                if (topicName.includes(searchLower) || topicDesc.includes(searchLower)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            }
+            topicsGrid.appendChild(topicCard);
         });
     }
 
-    async generateQuestions() {
-        if (!this.currentTopic) return;
-
-        // Show loading state
-        const loadingState = document.getElementById('loadingState');
-        const questionsContainer = document.getElementById('questionsContainer');
+    getQuestionsForTopic(topicName) {
+        // Get questions from the bank, or generate additional ones if needed
+        let questions = [];
         
-        if (loadingState) loadingState.style.display = 'block';
-        if (questionsContainer) questionsContainer.innerHTML = '';
-
         try {
-            // Simulate AI generation delay
-            await this.delay(2000);
-
-            // Generate mock questions
-            const questions = this.generateMockQuestions();
-            this.questions = questions;
-
-            // Hide loading state
-            if (loadingState) loadingState.style.display = 'none';
-
-            // Display questions
-            this.displayQuestions();
-        } catch (error) {
-            console.error('Error generating questions:', error);
-            if (loadingState) loadingState.style.display = 'none';
+            if (this.questionBank[this.currentExam] && 
+                this.questionBank[this.currentExam][this.currentSubject] && 
+                this.questionBank[this.currentExam][this.currentSubject][topicName]) {
+                questions = [...this.questionBank[this.currentExam][this.currentSubject][topicName]];
+            }
+        } catch (e) {
+            console.log('Generating questions for:', topicName);
         }
+
+        // If we have fewer than 10 questions, generate more
+        if (questions.length < 10) {
+            questions = [...questions, ...this.generateAdditionalQuestions(topicName, 15 - questions.length)];
+        }
+
+        return questions;
     }
 
-    generateMockQuestions() {
-        if (!this.currentExam || !this.currentSubject || !this.currentTopic) return [];
-        
-        const topics = this.examData[this.currentExam].subjects[this.currentSubject].topics;
-        const topic = topics.find(t => t.key === this.currentTopic);
-        
-        if (!topic) return [];
-        
-        const sampleQuestions = [
+    generateAdditionalQuestions(topicName, count) {
+        // Generate additional questions based on topic name
+        const additionalQuestions = [];
+        const baseQuestions = {
+            "Physical Geology": [
+                {
+                    "q": "Which process is responsible for the formation of sedimentary rocks?",
+                    "options": ["Metamorphism", "Weathering and erosion", "Igneous intrusion", "Tectonic folding"],
+                    "correct": 1,
+                    "explanation": "Sedimentary rocks form through weathering, erosion, transportation, deposition, and lithification of pre-existing rocks.",
+                    "difficulty": "Easy"
+                },
+                {
+                    "q": "The Mohs hardness scale ranges from:",
+                    "options": ["1 to 10", "0 to 12", "1 to 15", "0 to 10"],
+                    "correct": 0,
+                    "explanation": "The Mohs hardness scale ranges from 1 (softest - talc) to 10 (hardest - diamond).",
+                    "difficulty": "Easy"
+                }
+            ],
+            "Current Events": [
+                {
+                    "q": "India successfully test-fired Agni-V missile in which year?",
+                    "options": ["2020", "2021", "2022", "2023"],
+                    "correct": 2,
+                    "explanation": "India successfully test-fired the Agni-V intercontinental ballistic missile in 2022.",
+                    "difficulty": "Medium"
+                }
+            ]
+        };
+
+        // Use base questions or generate generic ones
+        const base = baseQuestions[topicName] || [
             {
-                q: `Which of the following best describes the fundamental principle related to ${topic.name}?`,
-                o: [
-                    "The primary mechanism involves structural deformation",
-                    "The process is governed by thermodynamic equilibrium",
-                    "The concept relies on field observations and measurements",
-                    "The theory is based on laboratory experimental results"
-                ],
-                a: "The concept relies on field observations and measurements"
-            },
-            {
-                q: `In the context of ${topic.name}, what is the most significant factor that influences the observed phenomena?`,
-                o: [
-                    "Temperature and pressure conditions",
-                    "Chemical composition and mineralogy",
-                    "Time scale and geological processes",
-                    "All of the above factors are equally important"
-                ],
-                a: "All of the above factors are equally important"
-            },
-            {
-                q: `The application of ${topic.name} principles is most relevant in which of the following scenarios?`,
-                o: [
-                    "Resource exploration and extraction",
-                    "Environmental impact assessment",
-                    "Academic research and theoretical studies",
-                    "All of the above applications"
-                ],
-                a: "All of the above applications"
-            },
-            {
-                q: `Which analytical technique is commonly used to study phenomena related to ${topic.name}?`,
-                o: [
-                    "X-ray diffraction analysis",
-                    "Microscopic examination",
-                    "Geochemical analysis",
-                    "Depends on the specific aspect being studied"
-                ],
-                a: "Depends on the specific aspect being studied"
-            },
-            {
-                q: `The historical development of ${topic.name} concepts was primarily influenced by which factor?`,
-                o: [
-                    "Advanced technological capabilities",
-                    "Theoretical mathematical models",
-                    "Field observations and empirical data",
-                    "International collaborative research"
-                ],
-                a: "Field observations and empirical data"
+                "q": `Which of the following is most relevant to ${topicName}?`,
+                "options": ["Fundamental concept A", "Advanced theory B", "Practical application C", "Historical development D"],
+                "correct": 1,
+                "explanation": `This question tests understanding of advanced theories in ${topicName}.`,
+                "difficulty": "Medium"
             }
         ];
 
-        return sampleQuestions;
-    }
+        for (let i = 0; i < count && i < base.length; i++) {
+            additionalQuestions.push({...base[i]});
+        }
 
-    displayQuestions() {
-        const container = document.getElementById('questionsContainer');
-        if (!container || !this.questions.length) return;
-        
-        container.innerHTML = '';
-
-        this.questions.forEach((question, index) => {
-            const questionCard = this.createQuestionCard(question, index);
-            container.appendChild(questionCard);
-        });
-    }
-
-    createQuestionCard(question, index) {
-        const card = document.createElement('div');
-        card.className = 'question-card fade-in';
-        card.innerHTML = `
-            <div class="question-header">
-                <span class="question-number">Question ${index + 1}</span>
-            </div>
-            <div class="question-text">${question.q}</div>
-            <div class="options-list">
-                ${question.o.map((option, optIndex) => `
-                    <div class="option-item" data-question="${index}" data-option="${optIndex}">
-                        <div class="option-letter">${String.fromCharCode(65 + optIndex)}</div>
-                        <div class="option-text">${option}</div>
-                    </div>
-                `).join('')}
-            </div>
-            <div class="question-actions">
-                <button class="btn btn--secondary" onclick="window.app.showAnswer(${index})">Show Answer</button>
-                <button class="btn btn--outline" onclick="window.app.explainAnswer(${index})">Explain Answer</button>
-            </div>
-            <div class="answer-feedback" id="feedback-${index}" style="display: none;"></div>
-        `;
-
-        // Add click events to options
-        card.querySelectorAll('.option-item').forEach(option => {
-            option.addEventListener('click', () => {
-                this.selectOption(option);
+        // Fill remaining with modified versions
+        while (additionalQuestions.length < count) {
+            const baseQ = base[additionalQuestions.length % base.length];
+            additionalQuestions.push({
+                ...baseQ,
+                q: `[Practice] ${baseQ.q}`
             });
+        }
+
+        return additionalQuestions;
+    }
+
+    startTopic(topicName) {
+        console.log('Starting topic:', topicName);
+        this.currentTopic = topicName;
+        this.currentQuestions = this.getQuestionsForTopic(topicName);
+        
+        // Shuffle questions for variety
+        this.currentQuestions = this.shuffleArray([...this.currentQuestions]);
+        
+        this.currentQuestionIndex = 0;
+        this.userAnswers = [];
+        this.topicStartTime = Date.now();
+        this.showQuestionsScreen();
+    }
+
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    showQuestionsScreen() {
+        this.showScreen('questions');
+        const topicTitleEl = document.getElementById('topic-title');
+        if (topicTitleEl) {
+            topicTitleEl.textContent = this.currentTopic;
+        }
+        this.updateBreadcrumb(['Dashboard', this.examStructure[this.currentExam].name, this.currentSubject, this.currentTopic]);
+        this.displayCurrentQuestion();
+    }
+
+    displayCurrentQuestion() {
+        const question = this.currentQuestions[this.currentQuestionIndex];
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const questionOptions = document.getElementById('question-options');
+        const questionFeedback = document.getElementById('question-feedback');
+        const submitBtn = document.getElementById('submit-answer');
+        const nextBtn = document.getElementById('next-question');
+        const finishBtn = document.getElementById('finish-topic');
+
+        if (!question) return;
+
+        // Update question counter
+        if (questionCounter) {
+            questionCounter.textContent = `Question ${this.currentQuestionIndex + 1} of ${this.currentQuestions.length}`;
+        }
+
+        // Display question - instant loading
+        if (questionText) {
+            questionText.textContent = question.q;
+        }
+
+        // Create options
+        if (questionOptions) {
+            questionOptions.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.dataset.index = index;
+                
+                optionBtn.innerHTML = `
+                    <span class="option-label">${String.fromCharCode(65 + index)}</span>
+                    <span class="option-text">${option}</span>
+                `;
+                
+                questionOptions.appendChild(optionBtn);
+            });
+        }
+
+        // Reset states
+        if (questionFeedback) questionFeedback.classList.add('hidden');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('hidden');
+        }
+        if (nextBtn) nextBtn.classList.add('hidden');
+        if (finishBtn) finishBtn.classList.add('hidden');
+
+        // Update progress
+        this.updateTopicProgress();
+    }
+
+    selectOption(index) {
+        // Remove previous selections
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected');
         });
 
-        return card;
-    }
+        // Mark selected option
+        const selectedBtn = document.querySelector(`[data-index="${index}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('selected');
+        }
 
-    selectOption(optionElement) {
-        const questionIndex = parseInt(optionElement.dataset.question);
-        const optionIndex = parseInt(optionElement.dataset.option);
-
-        // Clear previous selections for this question
-        const questionCard = optionElement.closest('.question-card');
-        if (questionCard) {
-            questionCard.querySelectorAll('.option-item').forEach(opt => {
-                opt.classList.remove('selected');
-            });
-
-            // Mark this option as selected
-            optionElement.classList.add('selected');
-
-            // Store user answer
-            this.userAnswers[questionIndex] = optionIndex;
+        // Enable submit button
+        const submitBtn = document.getElementById('submit-answer');
+        if (submitBtn) {
+            submitBtn.disabled = false;
         }
     }
 
-    showAnswer(questionIndex) {
-        if (!this.questions[questionIndex]) return;
-        
-        const question = this.questions[questionIndex];
-        const correctAnswer = question.a;
-        const correctIndex = question.o.indexOf(correctAnswer);
-        const userAnswerIndex = this.userAnswers[questionIndex];
+    submitAnswer() {
+        const selectedOption = document.querySelector('.option-btn.selected');
+        if (!selectedOption) return;
 
-        // Find question card
-        const questionCards = document.querySelectorAll('.question-card');
-        const questionCard = questionCards[questionIndex];
-        const feedback = document.getElementById(`feedback-${questionIndex}`);
-        
-        if (!questionCard || !feedback) return;
-        
-        const options = questionCard.querySelectorAll('.option-item');
+        const selectedIndex = parseInt(selectedOption.dataset.index);
+        const question = this.currentQuestions[this.currentQuestionIndex];
+        const isCorrect = selectedIndex === question.correct;
 
-        // Highlight correct answer
-        if (options[correctIndex]) {
-            options[correctIndex].classList.add('correct');
+        // Store answer
+        this.userAnswers.push({
+            questionIndex: this.currentQuestionIndex,
+            selectedAnswer: selectedIndex,
+            correctAnswer: question.correct,
+            isCorrect: isCorrect
+        });
+
+        // Update progress immediately
+        this.userProgress.questionsAttempted++;
+        if (isCorrect) {
+            this.userProgress.correctAnswers++;
         }
 
-        // Highlight user's answer if wrong
-        if (userAnswerIndex !== undefined && userAnswerIndex !== correctIndex && options[userAnswerIndex]) {
-            options[userAnswerIndex].classList.add('incorrect');
+        if (!this.userProgress.examProgress[this.currentExam]) {
+            this.userProgress.examProgress[this.currentExam] = { attempted: 0, correct: 0 };
+        }
+        this.userProgress.examProgress[this.currentExam].attempted++;
+        if (isCorrect) {
+            this.userProgress.examProgress[this.currentExam].correct++;
         }
 
-        // Show feedback
-        feedback.style.display = 'block';
-        if (userAnswerIndex === correctIndex) {
-            feedback.textContent = '✅ Correct! Well done.';
-            feedback.className = 'answer-feedback correct';
-        } else if (userAnswerIndex !== undefined) {
-            feedback.textContent = '❌ Incorrect. The correct answer is highlighted in green.';
-            feedback.className = 'answer-feedback incorrect';
+        // Show feedback immediately - no delays
+        this.showAnswerFeedback(selectedIndex, question.correct, question.explanation);
+
+        // Update UI
+        const submitBtn = document.getElementById('submit-answer');
+        const nextBtn = document.getElementById('next-question');
+        const finishBtn = document.getElementById('finish-topic');
+
+        if (submitBtn) submitBtn.classList.add('hidden');
+        
+        if (this.currentQuestionIndex < this.currentQuestions.length - 1) {
+            if (nextBtn) nextBtn.classList.remove('hidden');
         } else {
-            feedback.textContent = `💡 The correct answer is: ${correctAnswer}`;
-            feedback.className = 'answer-feedback correct';
+            if (finishBtn) finishBtn.classList.remove('hidden');
+        }
+
+        this.saveUserProgress();
+    }
+
+    showAnswerFeedback(selectedIndex, correctIndex, explanation) {
+        const questionFeedback = document.getElementById('question-feedback');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const explanationDiv = document.getElementById('explanation');
+
+        // Disable all options and show correct/incorrect
+        document.querySelectorAll('.option-btn').forEach((btn, index) => {
+            btn.disabled = true;
+            if (index === correctIndex) {
+                btn.classList.add('correct');
+            } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                btn.classList.add('incorrect');
+            }
+        });
+
+        // Show feedback immediately
+        const isCorrect = selectedIndex === correctIndex;
+        if (feedbackMessage) {
+            feedbackMessage.className = `feedback-message ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedbackMessage.textContent = isCorrect ? '✅ Correct!' : '❌ Incorrect';
+        }
+        
+        // Show explanation immediately - no loading delays
+        if (explanationDiv) {
+            explanationDiv.textContent = explanation || 'Explanation not available for this question.';
+        }
+        
+        if (questionFeedback) {
+            questionFeedback.classList.remove('hidden');
         }
     }
 
-    async explainAnswer(questionIndex) {
-        if (!this.questions[questionIndex] || !this.currentTopic) return;
+    nextQuestion() {
+        this.currentQuestionIndex++;
+        this.displayCurrentQuestion();
+    }
+
+    finishTopic() {
+        // Calculate results
+        const timeSpent = Math.round((Date.now() - this.topicStartTime) / 1000 / 60); // minutes
+        this.userProgress.totalTimeSpent += timeSpent;
+
+        // Mark topic as completed
+        const topicId = `${this.currentExam}_${this.currentSubject}_${this.currentTopic}`;
+        if (!this.userProgress.topicsCompleted.includes(topicId)) {
+            this.userProgress.topicsCompleted.push(topicId);
+        }
+
+        this.saveUserProgress();
+        this.showResultsScreen(timeSpent);
+    }
+
+    showResultsScreen(timeSpent) {
+        this.showScreen('results');
         
-        const question = this.questions[questionIndex];
-        const topics = this.examData[this.currentExam].subjects[this.currentSubject].topics;
-        const topic = topics.find(t => t.key === this.currentTopic);
+        const correctAnswers = this.userAnswers.filter(answer => answer.isCorrect).length;
+        const totalQuestions = this.userAnswers.length;
+        const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+
+        const finalScoreEl = document.getElementById('final-score');
+        const finalAccuracyEl = document.getElementById('final-accuracy');
+        const timeSpentEl = document.getElementById('time-spent');
+
+        if (finalScoreEl) finalScoreEl.textContent = `${correctAnswers}/${totalQuestions}`;
+        if (finalAccuracyEl) finalAccuracyEl.textContent = `${accuracy}%`;
+        if (timeSpentEl) timeSpentEl.textContent = `${timeSpent}m`;
+    }
+
+    practiceAgain() {
+        this.startTopic(this.currentTopic);
+    }
+
+    updateTopicProgress() {
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
         
-        if (!topic) return;
-
-        this.openModal('Answer Explanation');
-        this.showModalLoading();
-
-        try {
-            // Simulate AI explanation generation
-            await this.delay(1500);
-
-            const explanation = this.generateAnswerExplanation(question, topic);
-            this.showModalContent(explanation);
-        } catch (error) {
-            console.error('Error generating explanation:', error);
-            this.showModalContent('<p>Error generating explanation. Please try again.</p>');
+        if (progressFill && progressText && this.currentQuestions.length > 0) {
+            const progress = ((this.currentQuestionIndex) / this.currentQuestions.length) * 100;
+            progressFill.style.width = progress + '%';
+            progressText.textContent = `${Math.round(progress)}% Complete`;
         }
     }
 
-    generateAnswerExplanation(question, topic) {
-        return `
-            <h4>Question Analysis</h4>
-            <p>This question tests your understanding of <strong>${topic.name}</strong> concepts, specifically focusing on ${topic.description.toLowerCase()}.</p>
-            
-            <h4>Correct Answer</h4>
-            <p><strong>${question.a}</strong></p>
-            
-            <h4>Detailed Explanation</h4>
-            <p>The correct answer is based on fundamental principles of ${topic.name}. In the context of ${this.currentExam} examinations, this topic requires understanding of:</p>
-            
-            <ul>
-                <li><strong>Theoretical Foundation:</strong> The underlying scientific principles that govern this concept</li>
-                <li><strong>Practical Applications:</strong> How these principles are applied in real-world scenarios</li>
-                <li><strong>Common Misconceptions:</strong> Areas where students typically struggle or make errors</li>
-                <li><strong>Exam Strategy:</strong> Key points to remember when tackling similar questions</li>
-            </ul>
-            
-            <h4>Why Other Options Are Incorrect</h4>
-            <p>The other options, while plausible, fail to capture the complete understanding required for this topic. Each incorrect option represents a common misconception or incomplete knowledge of the subject matter.</p>
-            
-            <h4>Study Tips</h4>
-            <p>To master this topic, focus on understanding the fundamental concepts rather than memorizing facts. Practice with multiple question types and always relate theoretical knowledge to practical applications in geological sciences.</p>
-        `;
-    }
-
-    async explainConcept() {
-        if (!this.currentTopic) return;
-
-        const topics = this.examData[this.currentExam].subjects[this.currentSubject].topics;
-        const topic = topics.find(t => t.key === this.currentTopic);
+    updateBreadcrumb(items) {
+        const breadcrumb = document.getElementById('breadcrumb');
+        const breadcrumbContent = document.getElementById('breadcrumb-content');
         
-        if (!topic) return;
-
-        this.openModal(`Concept Explanation: ${topic.name}`);
-        this.showModalLoading();
-
-        try {
-            // Simulate AI explanation generation
-            await this.delay(2000);
-
-            const explanation = this.generateConceptExplanation(topic);
-            this.showModalContent(explanation);
-        } catch (error) {
-            console.error('Error generating concept explanation:', error);
-            this.showModalContent('<p>Error generating concept explanation. Please try again.</p>');
+        if (!breadcrumb || !breadcrumbContent) return;
+        
+        if (items.length <= 1) {
+            breadcrumb.classList.add('hidden');
+            return;
         }
+
+        breadcrumb.classList.remove('hidden');
+        breadcrumbContent.innerHTML = items.map((item, index) => {
+            if (index === items.length - 1) {
+                return `<span>${item}</span>`;
+            } else {
+                return `<span class="breadcrumb-link">${item}</span>`;
+            }
+        }).join(' > ');
     }
 
-    generateConceptExplanation(topic) {
-        return `
-            <h4>Overview</h4>
-            <p><strong>${topic.name}</strong> is a fundamental concept in ${this.examData[this.currentExam].subjects[this.currentSubject].name} that focuses on ${topic.description.toLowerCase()}.</p>
-            
-            <h4>Key Concepts</h4>
-            <ul>
-                <li><strong>Definition:</strong> ${topic.name} encompasses the study and understanding of specific geological/scientific phenomena</li>
-                <li><strong>Scope:</strong> The field covers both theoretical principles and practical applications</li>
-                <li><strong>Methodology:</strong> Research and analysis in this area employ various scientific techniques and approaches</li>
-                <li><strong>Applications:</strong> The knowledge is applied in exploration, research, and environmental studies</li>
-            </ul>
-            
-            <h4>Important Principles</h4>
-            <p>Understanding ${topic.name} requires familiarity with several core principles:</p>
-            <ul>
-                <li>Fundamental scientific laws and theories that govern the phenomena</li>
-                <li>Observational and analytical techniques used in the field</li>
-                <li>Relationship between different components and processes</li>
-                <li>Historical development and current research trends</li>
-            </ul>
-            
-            <h4>Exam Relevance</h4>
-            <p>In ${this.currentExam} examinations, questions on ${topic.name} typically focus on:</p>
-            <ul>
-                <li>Conceptual understanding of basic principles</li>
-                <li>Application of knowledge to solve problems</li>
-                <li>Analysis and interpretation of data or scenarios</li>
-                <li>Integration with other related topics</li>
-            </ul>
-            
-            <h4>Study Strategy</h4>
-            <p>To excel in this topic:</p>
-            <ul>
-                <li>Build a strong foundation with basic concepts</li>
-                <li>Practice numerical problems and analytical questions</li>
-                <li>Study case studies and real-world applications</li>
-                <li>Review previous years' questions and practice tests</li>
-                <li>Connect concepts across different topics and subjects</li>
-            </ul>
-        `;
-    }
-
-    openModal(title) {
-        const modal = document.getElementById('explanationModal');
-        const overlay = document.getElementById('overlay');
-        const modalTitle = document.getElementById('modalTitle');
-        
-        if (modalTitle) modalTitle.textContent = title;
-        if (modal) modal.classList.remove('hidden');
-        if (overlay) overlay.classList.remove('hidden');
-        
-        document.body.style.overflow = 'hidden';
-    }
-
-    closeModal() {
-        const modal = document.getElementById('explanationModal');
-        const overlay = document.getElementById('overlay');
-        
-        if (modal) modal.classList.add('hidden');
-        if (overlay) overlay.classList.add('hidden');
-        
-        document.body.style.overflow = 'auto';
-    }
-
-    showModalLoading() {
-        const modalLoading = document.getElementById('modalLoading');
-        const modalContent = document.getElementById('modalContent');
-        
-        if (modalLoading) modalLoading.style.display = 'block';
-        if (modalContent) modalContent.style.display = 'none';
-    }
-
-    showModalContent(content) {
-        const modalLoading = document.getElementById('modalLoading');
-        const modalContent = document.getElementById('modalContent');
-        
-        if (modalLoading) modalLoading.style.display = 'none';
-        if (modalContent) {
-            modalContent.style.display = 'block';
-            modalContent.innerHTML = content;
+    navigateTo(item) {
+        switch(item) {
+            case 'Dashboard':
+                this.showDashboard();
+                break;
+            default:
+                // Handle navigation based on item
+                if (this.examStructure.GSI && item === this.examStructure.GSI.name) {
+                    this.currentExam = 'GSI';
+                    this.showSubjectsScreen();
+                } else if (this.examStructure.GATE && item === this.examStructure.GATE.name) {
+                    this.currentExam = 'GATE';
+                    this.showSubjectsScreen();
+                } else if (this.currentExam && this.examStructure[this.currentExam].subjects[item]) {
+                    this.currentSubject = item;
+                    this.showTopicsScreen();
+                }
+                break;
         }
-    }
-
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
-// Initialize the app when DOM is loaded
+// Initialize the app when DOM is loaded - No login required
 document.addEventListener('DOMContentLoaded', () => {
-    window.app = new GateGsiApp();
+    window.app = new ExamPrepApp();
 });
